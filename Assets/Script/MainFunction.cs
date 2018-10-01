@@ -29,10 +29,11 @@ public class MainFunction : MonoBehaviour {
 
     private void iniciarDiccionario()
     {
-        keywords.Add("arriba", () => { moverJugador("UP"); });
-        keywords.Add("abajo", () => { moverJugador("DOWN"); });
-        keywords.Add("derecha", () => { moverJugador("RIGHT"); });
-        keywords.Add("izquierda", () => { moverJugador("LEFT"); });
+   
+        keywords.Add("up", () => { moverJugador("UP"); });
+        keywords.Add("down", () => { moverJugador("DOWN"); });
+        keywords.Add("right", () => { moverJugador("RIGHT"); });
+        keywords.Add("left", () => { moverJugador("LEFT"); });
         keywords.Add("norte", () => { moverJugador("UP"); });
         keywords.Add("sur", () => { moverJugador("DOWN"); });
         keywords.Add("este", () => { moverJugador("RIGHT"); });

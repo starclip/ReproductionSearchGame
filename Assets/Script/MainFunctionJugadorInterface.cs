@@ -11,34 +11,72 @@ public class MainFunctionJugadorInterface : MonoBehaviour {
     private KeywordRecognizer keywordRecognizer; // Diccionario.
     private Dictionary<string, Action> keywords = new Dictionary<string, Action>(); // Crea un diccionario.
     private DictationRecognizer dictationRecognizer; // Descifrador de texto.
+    private bool detectarNombreJugador = false;
 
     /* Inicializo el diccionario con las únicas dos palabras que se van a utilizar. */
-    private void iniciarDiccionario()
+    private void iniciarDiccionario(string texto)
     {
+        switch (texto)
+        {
+            case "my name":
+                nombrarJugador();
+                break;
+            case "name player":
+                nombrarJugador();
+                break;
+
+            case "player":
+                nombrarJugador();
+                break;
+
+            case "back":
+                volver();
+                break;
+
+            case "cancel":
+                volver();
+                break;
+
+            case "leave":
+                salirJuego();
+                break;
+
+            case "ready":
+                continuar();
+                break;
+
+            case "continue":
+                continuar();
+                break;
+
+            case "next":
+                continuar();
+                break;
+        }
         /* Nombrar al jugador. */
-        keywords.Add("nombrar jugador", () => { nombrarJugador(); });
-        keywords.Add("jugador", () => { nombrarJugador(); });
+        //keywords.Add("nombrar jugador", () => { nombrarJugador(); });
+        //keywords.Add("jugador", () => { nombrarJugador(); });
 
         /* Volver a la anterior pantalla. */
-        keywords.Add("atras", () => { volver(); });
-        keywords.Add("cancelar", () => { volver(); });
+        //keywords.Add("atras", () => { volver(); });
+        //keywords.Add("cancelar", () => { volver(); });
 
         /* Salir del juego. */
-        keywords.Add("salir", () => { salirJuego(); });
+        //keywords.Add("salir", () => { salirJuego(); });
 
         /* Continuar el juego. */
-        keywords.Add("listo", () => { continuar(); });
-        keywords.Add("continuar", () => { continuar(); });
-        keywords.Add("proseguir", () => { continuar(); });
+        //keywords.Add("listo", () => { continuar(); });
+        //keywords.Add("continuar", () => { continuar(); });
+        //keywords.Add("proseguir", () => { continuar(); });
     }
 
     // Use this for initialization
     void Start () {
         /* Cree el keyword Recognizer.*/
-        iniciarDiccionario();
-        keywordRecognizer = new KeywordRecognizer(keywords.Keys.ToArray());
-        keywordRecognizer.OnPhraseRecognized += KeywordRecognizerOnPraseRecognized;
-        keywordRecognizer.Start();
+       //iniciarDiccionario();
+       //keywordRecognizer = new KeywordRecognizer(keywords.Keys.ToArray());
+       //keywordRecognizer.OnPhraseRecognized += KeywordRecognizerOnPraseRecognized;
+       //keywordRecognizer.Start();
 
         /* Cree el dictation que detecta conforme avance. */
         dictationRecognizer = new DictationRecognizer();
@@ -46,10 +84,11 @@ public class MainFunctionJugadorInterface : MonoBehaviour {
         dictationRecognizer.DictationHypothesis += DictationRecognizer_DictationHypothesis;
         dictationRecognizer.DictationComplete += DictationRecognizer_DictationComplete;
         dictationRecognizer.DictationError += DictationRecognizer_DictationError;
+        dictationRecognizer.Start();
     }
 
     /* El keyword detecta los argumentos que le paso. */
-    private void KeywordRecognizerOnPraseRecognized(PhraseRecognizedEventArgs args)
+    /*private void KeywordRecognizerOnPraseRecognized(PhraseRecognizedEventArgs args)
     {
         Action keywordAction;
 
@@ -58,7 +97,7 @@ public class MainFunctionJugadorInterface : MonoBehaviour {
         {
             keywordAction.Invoke();
         }
-    }
+    }*/
 
     // Update is called once per frame
     void Update () {
@@ -71,10 +110,10 @@ public class MainFunctionJugadorInterface : MonoBehaviour {
 
         //if (PhraseRecognitionSystem.Status == SpeechSystemStatus.Running)
         // Reproducir sonido.
-        PhraseRecognitionSystem.Shutdown();
-        keywordRecognizer.Stop();
-       
-        dictationRecognizer.Start();
+        //PhraseRecognitionSystem.Shutdown();
+        //keywordRecognizer.Stop();
+        //dictationRecognizer.Start();
+        detectarNombreJugador = true;
     }
 
     /* Función invoca el siguiente Scene. */
@@ -116,26 +155,36 @@ public class MainFunctionJugadorInterface : MonoBehaviour {
     /* Función si ya nombre al jugador. */
     private void finalizarNombrar()
     {
-        PhraseRecognitionSystem.Shutdown();
-        this.dictationRecognizer.Stop();
+        //PhraseRecognitionSystem.Shutdown();
+        //this.dictationRecognizer.Stop();
 
-        this.keywordRecognizer.Start();
+        //this.keywordRecognizer.Start();
+        detectarNombreJugador = false;
     }
 
     private void DictationRecognizer_DictationResult(string text, ConfidenceLevel confidence)
     {
-        dictationRecognizer.Start();
+        //dictationRecognizer.Start();
         Debug.Log(text);
         //texto.text = text;
 
-        // Habría que usar un text builder en esta parte.
-
-        if (text == "listo" || text == "ready" || text == "finished" || text == "completed")
+        if (detectarNombreJugador)
         {
-            finalizarNombrar(); // Finalice y proceda a usar el phrase recognition.
+            obtenerNombreJugador(text);
+        }
+        else
+        {
+            iniciarDiccionario(text);
         }
 
+ 
+    }
+
+    private void obtenerNombreJugador(string text)
+    {        
+        //nombre que se va a enviar
         textoJugador.GetComponent<TextMesh>().text = text;
+        finalizarNombrar();
     }
 
     private void DictationRecognizer_DictationHypothesis(string text)
