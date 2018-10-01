@@ -23,62 +23,156 @@ public class MainFunction : MonoBehaviour {
     private bool hayRutaMostrada;
     private bool modoBerseck;
 
-    KeywordRecognizer keywordRecognizer;
-    Dictionary<string, Action> keywords = new Dictionary<string, Action>(); // Crea un diccionario.
 
 
-    private void iniciarDiccionario()
+    private void iniciarDiccionario(string text)
     {
-   
-        keywords.Add("up", () => { moverJugador("UP"); });
-        keywords.Add("down", () => { moverJugador("DOWN"); });
-        keywords.Add("right", () => { moverJugador("RIGHT"); });
-        keywords.Add("left", () => { moverJugador("LEFT"); });
-        keywords.Add("norte", () => { moverJugador("UP"); });
-        keywords.Add("sur", () => { moverJugador("DOWN"); });
-        keywords.Add("este", () => { moverJugador("RIGHT"); });
-        keywords.Add("oeste", () => { moverJugador("LEFT"); });
-        keywords.Add("noreste", () => { moverJugador("RIGHTUP"); });
-        keywords.Add("sureste", () => { moverJugador("RIGHTDOWN"); });
-        keywords.Add("noroeste", () => { moverJugador("LEFTUP"); });
-        keywords.Add("suroeste", () => { moverJugador("LEFTDOWN"); });
-        keywords.Add("mostrar ruta", () => { mostrarRuta(); });
-        keywords.Add("ocultar ruta", () => { ocultarRuta(); });
-        keywords.Add("activar diagonales", () => { activarDiagonales(); });
-        keywords.Add("desactivar diagonales", () => { desactivarDiagonales(); });
-        keywords.Add("diagonales", () => { setDiagonales(); });
-        keywords.Add("automatico", () => { activarModoBerseck(); });
-        keywords.Add("automático", () => { activarModoBerseck(); });
-        keywords.Add("modo berseck", () => { activarModoBerseck(); });
+        switch (text)
+        {
+            case "up":
+                moverJugador("UP");
+                break;
 
-        /* Diccionario y comandos de la cámara. */
-        keywords.Add("encoger", () => { encoger(10); });
-        keywords.Add("expandir", () => { expandir(10); });
-        keywords.Add("agrandar", () => { expandir(10); });
-        keywords.Add("alejate", () => { expandir(3); });
-        keywords.Add("acercate", () => { encoger(3); });
-        keywords.Add("zoom out", () => { expandir(2); });
-        keywords.Add("zoom in", () => { encoger(2); });
-        keywords.Add("camara derecha", () => { moverCamara("RIGHT"); });
-        keywords.Add("camara izquierda", () => { moverCamara("LEFT"); });
-        keywords.Add("camara abajo", () => { moverCamara("DOWN"); });
-        keywords.Add("camara arriba", () => { moverCamara("UP"); });
-        keywords.Add("cámara derecha", () => { moverCamara("RIGHT"); });
-        keywords.Add("cámara izquierda", () => { moverCamara("LEFT"); });
-        keywords.Add("cámara abajo", () => { moverCamara("DOWN"); });
-        keywords.Add("cámara arriba", () => { moverCamara("UP"); });
+            case "down":
+                moverJugador("DOWN");
+                break;
 
-        /* Crear tablero */
-        keywords.Add("crear tablero", () => { preCreacion(); });
-        keywords.Add("create chess", () => { preCreacion(); });
-        keywords.Add("crear cuadricula", () => { preCreacion(); });
-        keywords.Add("create box", () => { preCreacion(); });
+            case "right":
+                moverJugador("RIGHT");
+                break;
+
+            case "left":
+                moverJugador("LEFT");
+                break;
+
+            case "north":
+                moverJugador("UP");
+                break;
+
+            case "south":
+                moverJugador("DOWN");
+                break;
+
+            case "east":
+                moverJugador("RIGHT");
+                break;
+
+            case "west":
+                moverJugador("LEFT");
+                break;
+
+            case "north east":
+                moverJugador("RIGHTUP");
+                break;
+
+            case "south east":
+                moverJugador("RIGHTDOWN");
+                break;
+
+            case "north west":
+                moverJugador("LEFTUP");
+                break;
+
+            case "south west":
+                moverJugador("LEFTDOWN");
+                break;
+
+            case "show route":
+                mostrarRuta();
+                break;
+
+            case "hide route":
+                ocultarRuta();
+                break;
+
+            case "show":
+                mostrarRuta();
+                break;
+
+            case "activate diagonals":
+                activarDiagonales();
+                break;
+
+            case "desactivate diagonals":
+                desactivarDiagonales();
+                break;
+
+            case "diagonals":
+                setDiagonales();
+                break;
+
+            case "automatic":
+                activarModoBerseck();
+                break;
+
+            case "berseck mode":
+                activarModoBerseck();
+                break;
+
+            /* Diccionario y comandos de la cámara. */
+            case "shrink":
+                encoger(10);
+                break;
+
+            case "expand":
+                expandir(10);
+                break;
+
+            case "magnify":
+                expandir(10);
+                break;
+
+            case "zoom in":
+                encoger(2);
+                break;
+
+            case "zoom out":
+                expandir(2);
+                break;
+
+            case "camera right":
+                moverCamara("RIGHT");
+                break;
+
+            case "camera left":
+                moverCamara("LEFT");
+                break;
+
+            case "camera down":
+                moverCamara("DOWN");
+                break;
+
+            case "camera up":
+                moverCamara("UP");
+                break;
+
+
+            /* Crear tablero */
+            case "create board":
+                preCreacion();
+                break;
+
+            case "create grid":
+                preCreacion();
+                break;
+
+            case "create box":
+                preCreacion();
+                break;
+
+            default:
+                UnityEngine.Debug.Log("PALABRA NO RECONOCIBLE");
+                break;
+        }
+
+     
     }
     
     /* Crear una nueva tabla... necesito procesar los comandos. */
     private void preCreacion()
     {
-        // Llamo a una nueva scene. 
+        // Llamo a una nueva scene.
+        crearTablero();
     }
 
     /* Mover la ficha a una posición nueva. */
@@ -87,16 +181,20 @@ public class MainFunction : MonoBehaviour {
         
     }
 
-    private void KeywordRecognizerOnPraseRecognized(PhraseRecognizedEventArgs args)
+    /*private void DictationRecognizer_DictationResult(string text, ConfidenceLevel confidence)
     {
-        Action keywordAction;
+        //dictationRecognizer.Start();
+        Debug.Log(text);
+        //texto.text = text;
 
-        print(args.text);
-        if (keywords.TryGetValue(args.text, out keywordAction))
-        {
-            keywordAction.Invoke();
-        }
-    }
+        iniciarDiccionario(text);
+
+
+    }*/
+
+   
+
+ 
 
     /* Se configura la camara en el equipo. */
     private void configurarCamara()
@@ -107,14 +205,8 @@ public class MainFunction : MonoBehaviour {
         camara.transform.position = camaraPosition;
     }
 
-	// Use this for initialization
-	void Start () {
-        iniciarDiccionario();
-
-        keywordRecognizer = new KeywordRecognizer(keywords.Keys.ToArray());
-        keywordRecognizer.OnPhraseRecognized += KeywordRecognizerOnPraseRecognized;
-        keywordRecognizer.Start();
-
+    public void crearTablero()
+    {
         tablero = TableroFisico.GetComponent<Tablero>();
         this.filas = obtenerFilas(largo, a);
         this.columnas = obtenerColumnas(ancho, a);
@@ -125,7 +217,13 @@ public class MainFunction : MonoBehaviour {
         tablero.seleccionarEnemigos(this.enemy);
         configurarCamara();
         this.modoBerseck = false;
+    }
+
+	// Use this for initialization
+	void Start () {
+
         
+
     }
 	
 	// Update is called once per frame
