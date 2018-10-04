@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour {
 
-    public GameObject bebe;
+    public GameObject bebe = null;
     private double turnSpeed;
     private bool direction;
 

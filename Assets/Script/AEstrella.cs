@@ -294,17 +294,6 @@ public class AEstrella : MonoBehaviour {
         return this.distanciaRecorrida;
     }
 
-    /* Imprimir la ruta óptima */
-    public void imprimirRuta()
-    {
-        string text = "";
-        for (int i = 0; i < this.listaCompletados.Count; i++)
-        {
-            text += " (" + this.listaCompletados[i].getX() + " , " + this.listaCompletados[i].getY() + ") ";
-        }
-        Debug.Log("Ruta óptima: " + text);
-    }
-
     /* Realiza el algoritmo estrella. */
     public bool accion(bool diagonales)
     {

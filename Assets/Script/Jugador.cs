@@ -31,18 +31,18 @@ public class Jugador : MonoBehaviour {
     }
 
     /* Almacena en una lista los movimientos que guían a la ruta óptima. */
-    public void obtenerPosiblesMovimientos(List<Ficha> rutaOptima)
+    public bool obtenerPosiblesMovimientos(List<Ficha> rutaOptima)
     {
         if (rutaOptima == null)
         {
             Debug.Log("No hay ruta optima");
-            return;
+            return false;
         }
 
         if (rutaOptima.Count == 0)
         {
             Debug.Log("No hay posibles movimientos");
-            return;
+            return false;
         }
 
         posiblesMovimientos = new String[rutaOptima.Count - 1];
@@ -63,6 +63,7 @@ public class Jugador : MonoBehaviour {
             text += name + " - ";
         }
         Debug.Log(text);
+        return true;
     }
 
     /* Dados dos fichas encuentre cual es el movimiento apto. */
@@ -474,7 +475,6 @@ public class Jugador : MonoBehaviour {
                     GetComponent<Rigidbody2D>().velocity = new Vector2(speed, 0);
                 }else
                 {
-                    Debug.Log("He llegado");
                     change = false; // Se debe decidir tomar una nueva decisión.
                     setAnimation(false);
                     GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0); // Esté estático.
@@ -500,7 +500,6 @@ public class Jugador : MonoBehaviour {
                 }
                 else
                 {
-                    Debug.Log("He llegado");
                     change = false; // Se debe decidir tomar una nueva decisión.
                     setAnimation(false);
                     GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0); // Esté estático.
@@ -526,7 +525,6 @@ public class Jugador : MonoBehaviour {
                 }
                 else
                 {
-                    Debug.Log("He llegado");
                     change = false; // Se debe decidir tomar una nueva decisión.
                     setAnimation(false);
                     GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0); // Esté estático.
@@ -552,7 +550,6 @@ public class Jugador : MonoBehaviour {
                 }
                 else
                 {
-                    Debug.Log("He llegado");
                     change = false; // Se debe decidir tomar una nueva decisión.
                     setAnimation(false);
                     GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0); // Esté estático.

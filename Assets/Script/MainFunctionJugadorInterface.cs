@@ -3,6 +3,7 @@ using UnityEngine;
 using System;
 using UnityEngine.Windows.Speech;
 using System.Linq;
+using System.Collections;
 
 public class MainFunctionJugadorInterface : MonoBehaviour {
 
@@ -13,9 +14,20 @@ public class MainFunctionJugadorInterface : MonoBehaviour {
     private bool detectarNombreJugador = false;
     private string playerName = "semento";
 
+    public GameObject nameSound;
+    public GameObject sayNameSound;
+
+    private AudioSource nameAudio;
+    private AudioSource sayNameAudio;
+
+    private AudioSource[] audios;
+
+    private DictationRecognizer dictator;
+
     /* Inicializo el diccionario con las únicas dos palabras que se van a utilizar. */
-   public void iniciarDiccionario(string texto)
+    public void iniciarDiccionario(string texto)
     {
+        
         switch (texto)
         {
             case "my name":
@@ -34,7 +46,31 @@ public class MainFunctionJugadorInterface : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        
+        nameAudio = nameSound.GetComponent<AudioSource>();
+        sayNameAudio = sayNameSound.GetComponent<AudioSource>();
+    }
+
+    /* Reproducir audio... */
+    public void playAudio(DictationRecognizer dictator, AudioSource audio)
+    {
+        this.dictator = dictator;
+        if (audio == null)
+        {
+            StartCoroutine(play(nameAudio));
+        }else
+        {
+            StartCoroutine(play(audio));
+        }
+    }
+
+    IEnumerator play(AudioSource audio)
+    {
+        dictator.Stop();
+        //Debug.Log("Audio - Desactivado");
+        audio.Play();
+        yield return new WaitForSeconds(audio.clip.length);
+        dictator.Start();
+        //Debug.Log("Audio - Activado");
     }
 
 
@@ -47,17 +83,19 @@ public class MainFunctionJugadorInterface : MonoBehaviour {
     private void nombrarJugador()
     {
         detectarNombreJugador = true;
+        //sayNameAudio.Play();
+        playAudio(this.dictator, sayNameAudio);
     }
 
 
     /* Función si ya nombre al jugador. */
     private void finalizarNombrar()
     {
-        //PhraseRecognitionSystem.Shutdown();
-        //this.dictationRecognizer.Stop();
-
-        //this.keywordRecognizer.Start();
+        
         detectarNombreJugador = false;
+        //nameAudio.Play();
+        playAudio(this.dictator, nameAudio);
+
     }
 
    public void dictationResult(string text)

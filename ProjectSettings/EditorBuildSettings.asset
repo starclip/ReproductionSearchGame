@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Levels/EscenaJugador.unity
     guid: 434604717dc9ebf48b6ac9eaa16a4d42
+  - enabled: 1
+    path: Assets/Levels/EscenaTablero.unity
+    guid: c5402c0c2a2ae4949b08ff917a9343b2
   m_configObjects: {}

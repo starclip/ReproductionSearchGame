@@ -11,37 +11,35 @@ using UnityEngine.UI;
 
 public class MainFunctionFirstInterface : MonoBehaviour {
 
-    /* Reconocedor de voz. */
-    //KeywordRecognizer keywordRecognizer;
-   
-
+    public GameObject sonidoBienvenida;
+    private AudioSource audio;
+    private DictationRecognizer dictation;
 
     // Use this for initialization
     void Start () {
-        //iniciarDiccionario();
-        //keywordRecognizer = new KeywordRecognizer(keywords.Keys.ToArray(), confidence);
-        //keywordRecognizer.OnPhraseRecognized += KeywordRecognizerOnPraseRecognized;
-        //keywordRecognizer.Start();
+        audio = sonidoBienvenida.GetComponent<AudioSource>();
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    IEnumerator play()
+    {
+        dictation.Stop();
+        //Debug.Log("Desactivado");
+        audio.Play();
+        yield return new WaitForSeconds(audio.clip.length);
+        dictation.Start();
+        //Debug.Log("Activado");
+    }
+
+    public void playAudio(DictationRecognizer dictation)
+    {
+        this.dictation = dictation;
+        StartCoroutine(play());
+    }
+
+    // Update is called once per frame
+    void Update () {
 		
 	}
-
-
- 
-    /* El keyword detecta los argumentos que le paso. */
-    /*private void KeywordRecognizerOnPraseRecognized(PhraseRecognizedEventArgs args)
-    {
-        Action keywordAction;
-        print(args.text);
-
-        if (keywords.TryGetValue(args.text, out keywordAction))
-        {
-            keywordAction.Invoke();
-        }
-    }*/
 
     /* Inicia el juego... saltó a la siguiente Scene. */
     public void iniciarJuego()

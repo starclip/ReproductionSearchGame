@@ -10,6 +10,10 @@ public class Tablero : MonoBehaviour {
     public GameObject jugadorPrefab;
     public GameObject prefabEnemigos;
     public GameObject huellas;
+    public GameObject soundWin;
+    public GameObject movePlayerSound;
+    private AudioSource audioWin;
+    private AudioSource audioPlayer;
     private int filas;
     private int columnas;
     private float distanciaX;
@@ -24,18 +28,23 @@ public class Tablero : MonoBehaviour {
     private List<Ficha> rutaOptima;
     private GameObject[,] tablero;
     private GameObject[] rutaHuellasOptimas;
+    private bool stateReproducir;
     
 	// Use this for initialization
 	void Start () {
-
+        audioWin = soundWin.GetComponent<AudioSource>();
+        audioPlayer = movePlayerSound.GetComponent<AudioSource>();
     }
 
-    public void inicializar(int filas, int columnas, int A, int distancia, int enemigos)
+    public void inicializar(int filas, int columnas, int A, int distancia)
     {
         this.filas = filas;
         this.columnas = columnas;
         this.rutaOptima = new List<Ficha>();
         this.tablero = new GameObject[filas, columnas];
+        int numEnemies = (int) ((this.filas * this.columnas) / 4);
+        int enemigos = numEnemies;
+        Debug.Log("Enemigos: " + enemigos);
         this.enemigos = new GameObject[enemigos];
         this.numeroFichas = filas * columnas;
         this.rutaOptima = new List<Ficha>();
@@ -44,23 +53,22 @@ public class Tablero : MonoBehaviour {
         this.A = A;
         setDistancias(A); // Configuro las distancias de A.
         expandirImagen();
+        stateReproducir = false;
     }
 
     /* Ubique el centro de los cuadros. */
     public Vector3 ubicarCentro()
     {
-        Debug.Log("Distancia X: " + distanciaX + " - Distancia Y: " + distanciaY);
         Vector2 puntoX4 = new Vector2(transform.position.x + this.distanciaX * this.columnas, transform.position.y + this.distanciaY * this.filas);
 
         float posX = (puntoX4.x / 2);
         float posY = (puntoX4.y / 2);
 
-        Debug.Log("PuntoX4: X -> " + puntoX4.x + " - Y -> " + puntoX4.y);
-        Debug.Log("PosX: " + posX + " - PosY: " + posY);
         Vector3 resultado = new Vector3(posX , -posY, 50);
         return resultado;
     }
 
+    /* Expandir la imagen de acuerdo con el a. */
     private void expandirImagen()
     {
         float dateScale = (float)0.15;
@@ -73,9 +81,26 @@ public class Tablero : MonoBehaviour {
         pantallaRoja.transform.position = ubicarCentro();
     }
 
+    /* Establecer las coordenadas del jugador. */
     private void setJugadorCoord(int x, int y)
     {
         this.jugador.GetComponent<Ficha>().setLocation(x, y);
+    }
+
+    /* Mover al jugador a las coordenadas X y Y. */
+    public void transportPlayer(int x, int y)
+    {
+        GameObject fichaObj = getFicha(x, y);
+        this.jugador.transform.position = fichaObj.transform.position;
+        setJugadorCoord(x, y);
+    }
+
+    /* Mover la meta a las coordenadas X y Y. */
+    public void transportGoal(int x, int y)
+    {
+        GameObject fichaObj = getFicha(x, y);
+        this.meta.transform.position = fichaObj.transform.position;
+        this.meta.GetComponent<Ficha>().setLocation(x, y);
     }
     
     /* *******************************************************
@@ -110,7 +135,6 @@ public class Tablero : MonoBehaviour {
             return false; // Es un enemigo.
         }
 
-        Debug.Log("Compararé exitosamente.");
         if (diagonal)
         {
             Ficha fuente = this.jugador.GetComponent<Ficha>();
@@ -125,7 +149,8 @@ public class Tablero : MonoBehaviour {
             }
         }
 
-        Debug.Log("No representa un problema.");
+        Debug.Log("It's easy to me....");
+        audioPlayer.Play();
         return true; // Movimiento válido.
     }
 
@@ -240,16 +265,41 @@ public class Tablero : MonoBehaviour {
         jugador.GetComponent<Jugador>().setDistances(this.distanciaX, this.distanciaY); // Distancias a avanzar.
     }
 
+    /* Compare si un movimiento es válido. */
+    public bool movimientoValido(int x, int y)
+    {
+        GameObject fichaObj = getFicha(x, y);
+        Ficha ficha = fichaObj.GetComponent<Ficha>();
+
+        // Si el movimiento al que se quiere ir está en un enemigo.
+        if (ficha.compararMuchasFichas(this.enemigos))
+        {
+            return false; // No es un movimiento válido.
+        }
+
+        if (ficha.compararFicha(this.jugador))
+        {
+            return false;
+        }
+
+        if (ficha.compararFicha(this.meta))
+        {
+            return false;
+        }
+
+        return true; // Movimiento válido.
+    }
+
     /* *******************************************************
      * Se seleccionan las posiciones para asignar los enemigos.
      * Se deben haber seleccionado previamente la meta y el inicio.
      *********************************************************/
-    public void seleccionarEnemigos(int numeroEnemigos)
+    public void seleccionarEnemigos()
     {
         //this.enemigos = new Enemigo[numeroEnemigos];
 
         // Creo N número de enemigos.
-        for (int i = 0; i < numeroEnemigos; i++)
+        for (int i = 0; i < this.enemigos.Length; i++)
         {
             GameObject objeto = obtenerficha();
             Ficha fichaTemp = objeto.gameObject.GetComponent<Ficha>();
@@ -374,7 +424,18 @@ public class Tablero : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-		
+		if (jugador != null && meta != null)
+        {
+            Ficha jugadorFicha = jugador.GetComponent<Ficha>();
+            if (jugadorFicha != null)
+            {
+                if (jugadorFicha.compararFicha(meta) && stateReproducir == false)
+                {
+                    audioWin.Play();
+                    stateReproducir = true;
+                }
+            }
+        }
 	}
 
     /* Configuramos las distancias con respecto a nuestro a. */
@@ -401,41 +462,6 @@ public class Tablero : MonoBehaviour {
     public List<Ficha> obtenerRuta()
     {
         return this.rutaOptima;
-    }
- 
-    public void printTablero()
-    {
-        Debug.Log("Tablero: ");
-        String message = "";
-        for (int i = 0; i < this.filas; i++)
-        {
-            message = "";
-            for (int j = 0; j < this.columnas; j++)
-            {
-                Ficha ficha = tablero[i, j].GetComponent<Ficha>();
-                message += " - ";
-                if (ficha.compararFicha(this.jugador))
-                {
-                    message += "J";
-                }
-                else if (ficha.compararFicha(this.meta))
-                {
-                    message += "M";
-                }
-                else if (ficha.compararMuchasFichas(this.enemigos))
-                {
-                    message += "E";
-                }else if (ficha.compararListasFichas(this.rutaOptima.ToArray()))
-                {
-                    message += "*";
-                }
-                else
-                { 
-                    message += "(" + ficha.getX() + "," + ficha.getY() + ")";
-                }
-            }
-            Debug.Log(message);
-        }
     }
 
     /* Destruye el tablero de juego. */
